@@ -85,10 +85,22 @@
 			}
 			
 			
-			navigator.webkitGetUserMedia( {audio:true}, playSound, function( err ) {
-    			console.log("The following error occured: " + err);
-			});
-			
+			var userMeida = (
+                navigator.getUserMedia ||
+                navigator.webkitGetUserMedia ||
+                navigator.mozGetUserMedia ||
+                navigator.oGetUserMedia ||
+                navigator.msGetUserMedia
+            )
+
+            if ( userMeida ){
+                userMeida.call( navigator, {audio:true}, playSound, function( err ) {
+                    console.log("The following error occured: " + err);
+                });  
+            } else {
+                reject( Error( 'user media inavailable' ) );
+            }
+            
 			
 		} else {
 			console.log( 'no web audio for you' );

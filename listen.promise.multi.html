@@ -12,17 +12,23 @@
 			margin: 0;
 		}
 		
-		canvas { 
+		.canvas { 
 			height: 100vh; 
 		  	width: 100vw; 
 			display: block;
+            position: absolute;
+            // try and force some hardware rendering
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
 		}
 	
 	</style>
 </head>
 <body>
 	
-	<canvas id="canvas" height="256"></canvas>
+	<canvas class="canvas" height="256"></canvas>
+    <canvas class="canvas" height="256"></canvas>
+    <canvas class="canvas" height="256"></canvas>
 
 	<script>	
 					
@@ -96,33 +102,47 @@
         }
         
         // function to draw the line
-        function drawLine( analyser ){
+        var drawLine = function( analyser, canvasNo ){
             
-            var len = analyser.frequencyBinCount,					
-                timeDomain = new Uint8Array( len ),
-                canvas = document.getElementById( 'canvas' ),
-                drawContext = canvas.getContext( '2d' );
+            var canvass = document.querySelectorAll( '.canvas' ),
+                contexts = Array.prototype.map.call( canvass, function( elm ){
+                    return elm.getContext( '2d' );
+                }),
+                canLen = canvass.length;
+            
+            drawLine = function( analyser, canvasNo ){
+                
+                var len = analyser.frequencyBinCount,					
+                    timeDomain = new Uint8Array( len ),
+                    canvasNo = canvasNo || 0,
+                    canvas = canvass[ canvasNo ],
+                    drawContext = contexts[ canvasNo ]; 
 
-            canvas.width = len;
-                        
-            analyser.getByteTimeDomainData( timeDomain );
+                canvas.width = len;
+
+                analyser.getByteTimeDomainData( timeDomain );
 
 
-            //http://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
-            for (var i = 1; i < len - 2; i ++){
-                var xc = i + 0.5;
-                var yc = ( timeDomain[ i ] + timeDomain[ i + 1 ] ) / 2;
-                drawContext.quadraticCurveTo( i, timeDomain[ i ], xc, yc );
-            }	
+                //http://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
+                for (var i = 1; i < len - 2; i ++){
+                    var xc = i + 0.5;
+                    var yc = ( timeDomain[ i ] + timeDomain[ i + 1 ] ) / 2;
+                    drawContext.quadraticCurveTo( i, timeDomain[ i ], xc, yc );
+                }	
 
 
-            drawContext.strokeStyle = 'black';
-            drawContext.stroke(); 
+                drawContext.strokeStyle = 'black';
+                drawContext.stroke(); 
 
-            // request animation frame goes on forever. Should fix. 
-            requestAnimationFrame( function(){
-                drawLine( analyser );
-            });	
+                // request animation frame goes on forever. Should fix. 
+                requestAnimationFrame( function(){
+                    drawLine( analyser, ++canvasNo % canLen );
+                });	
+                
+            }
+            
+            drawLine( analyser, canvasNo );
+            
             
             
         }

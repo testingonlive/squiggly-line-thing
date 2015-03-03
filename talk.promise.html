@@ -31,7 +31,20 @@
             
             // return a new Promise obj
             return new Promise(function( resolve, reject ){
-                navigator.webkitGetUserMedia( {audio:true}, resolve, reject );         
+                var userMeida = (
+                    navigator.getUserMedia ||
+                    navigator.webkitGetUserMedia ||
+                    navigator.mozGetUserMedia ||
+                    navigator.oGetUserMedia ||
+                    navigator.msGetUserMedia
+                )
+                
+                if ( userMeida ){
+                    userMeida.call( navigator, {audio:true}, resolve, reject );  
+                } else {
+                    reject( Error( 'user media inavailable' ) );
+                }
+                       
             });
         }
         
@@ -99,9 +112,7 @@
             
             getAudio()
                 .then( playSound( context ) )
-                .then(function( analyser ){
-                    drawLine( analyser );
-                });
+                .then( drawLine );
             
         
         } else {

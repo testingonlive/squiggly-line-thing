@@ -1,12 +1,10 @@
 #squiggly-line-thing
 
-Messing around with the web audio API
+Messing around with the web audio API, user media api + promises.
 
-- listen.html should work in any browsers where the api is implemented - http://caniuse.com/#feat=audio-api
-- talk.html + talk.promise.html use prefixed wekit get user media at the moment
-- listen.promise.html + talk.promise.html use promises. Code is nicer where it works.
+- http://caniuse.com/#feat=audio-api
+- http://caniuse.com/#feat=stream
+- http://caniuse.com/#feat=promises
 - I've tested it in chrome.
 
 @TODO clear request animation frame on finish
-@TODO babeljs version
-@TODO sort webkit prefix
